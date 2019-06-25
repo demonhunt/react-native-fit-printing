@@ -183,6 +183,7 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
             image = createLogo2();
             mPrinter.SetLogo(image, 2);
             mPrinter.Disconnect();
+            promise.resolve("success");
         } catch (Exception e) {
             promise.reject(e);
         }
