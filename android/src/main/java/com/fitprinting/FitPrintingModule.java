@@ -63,8 +63,11 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printBill(String ip, ReadableArray a, ReadableArray c, ReadableMap d, Promise promise) {
+    public void printBill(String ip, ReadableMap data, Promise promise) {
         try {
+            ReadableArray a = data.getArray("listOrigin");
+            ReadableArray c = data.getArray("listTotal");
+            ReadableMap d = data.getMap("labelInfo");
             Bitmap b;
             Connect(ip);
             b = createLogo(d.getString("orderId").split("_")[0]);
