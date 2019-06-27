@@ -150,6 +150,7 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
             mPrinter.Disconnect();
             promise.resolve("success");
         } catch (Exception e) {
+            mPrinter.Disconnect();
             Log.v("ReactNative","error");
             promise.reject(e.getMessage());
         }
