@@ -9,6 +9,7 @@ import java.util.concurrent.TimeoutException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -156,6 +157,68 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         }
     }
 
+
+    @ReactMethod
+    public void printGrab(String ip, ReadableMap data, Promise promise) {
+        try {
+            String name = data.getString("name");
+            String phone = data.getString("phone");
+            String plateNumber = data.getString("plateNumber");
+            Bitmap b;
+            Connect(ip);
+          
+        
+            b = createGrabLabel(name,phone,plateNumber);
+            mPrinter.PrintImage(b);
+            mPrinter.PaperFeed(64);
+
+            mPrinter.CutPaper(0);
+            mPrinter.Disconnect();
+            promise.resolve("success");
+        } catch (Exception e) {
+            mPrinter.Disconnect();
+            Log.v("ReactNative","error");
+            promise.reject(e.getMessage());
+        }
+    }
+
+    public Bitmap createGrabLabel(String name, String phone, String plateNumber) throws Exception {
+        Paint paint2 = new Paint();
+        paint2.setColor(Color.WHITE);
+        paint2.setStyle(Paint.Style.FILL);
+        TextPaint tp = new TextPaint();
+        tp.setColor(Color.BLACK);
+        tp.setTextAlign(Paint.Align.LEFT);
+        tp.setAntiAlias(true);
+        tp.setTypeface(Typeface.create("Times New Roman", Typeface.BOLD));
+
+        tp.setTextSize(100);
+        StaticLayout Name = new StaticLayout(name, tp, 1000, Layout.Alignment.ALIGN_CENTER, 1, 0, false);
+
+        StaticLayout Phone = new StaticLayout(phone, tp, 1000, Layout.Alignment.ALIGN_CENTER, 1, 0, false);
+
+        // tp.setTextSize(50);
+        StaticLayout PlateNumber = new StaticLayout(plateNumber, tp, 1000, Layout.Alignment.ALIGN_CENTER, 1, 0, false);
+
+        Bitmap image = Bitmap.createBitmap(1000, 500, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(image);
+        canvas.drawPaint(paint2);
+        Name.draw(canvas);
+        canvas.translate(0, 150);
+        tp.setTextSize(50);
+        Phone.draw(canvas);
+        canvas.translate(0, 150);
+        PlateNumber.draw(canvas);
+
+        return RotateBitmap(image,90);
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
     public void Connect(String ip) throws Exception {
         final String tempIp = ip;
         final Runnable stuffToDo = new Thread() {
@@ -192,27 +255,6 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
 
     }
 
-    public static Bitmap textAsBitmap(String text, float textSize, int textColor) throws Exception {
-
-        Paint paint = new Paint();
-        Paint paint2 = new Paint();
-        paint2.setColor(Color.WHITE);
-        paint2.setStyle(Paint.Style.FILL);
-        paint.setTextSize(textSize);
-        paint.setColor(textColor);
-        paint.setTextAlign(Paint.Align.LEFT);
-        float baseline = -paint.ascent(); // ascent() is negative
-        int width = (int) (paint.measureText(text) + 0.0f); // round
-        int height = (int) (baseline + paint.descent() + 0.0f);
-
-        int trueWidth = width;
-        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(image);
-        canvas.drawPaint(paint2);
-        canvas.drawText(text, width / 2 - trueWidth / 2, baseline, paint);
-        return image;
-    }
 
     public static String priceWithoutDecimal(Double price) {
         DecimalFormat formatter = new DecimalFormat("###,###,###.##");
