@@ -205,7 +205,6 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         canvas.drawPaint(paint2);
         Name.draw(canvas);
         canvas.translate(0, 150);
-        tp.setTextSize(50);
         Phone.draw(canvas);
         canvas.translate(0, 150);
         PlateNumber.draw(canvas);
