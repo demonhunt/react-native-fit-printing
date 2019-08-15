@@ -163,12 +163,12 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         try {
             String name = data.getString("name");
             String phone = data.getString("phone");
-            String plateNumber = data.getString("plateNumber");
+            String licensePlate = data.getString("licensePlate");
             Bitmap b;
             Connect(ip);
           
         
-            b = createGrabLabel(name,phone,plateNumber);
+            b = createGrabLabel(name,phone,licensePlate);
             mPrinter.PrintImage(b);
             mPrinter.PaperFeed(64);
 
@@ -182,7 +182,7 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         }
     }
 
-    public Bitmap createGrabLabel(String name, String phone, String plateNumber) throws Exception {
+    public Bitmap createGrabLabel(String name, String phone, String licensePlate) throws Exception {
         Paint paint2 = new Paint();
         paint2.setColor(Color.WHITE);
         paint2.setStyle(Paint.Style.FILL);
@@ -198,7 +198,7 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         StaticLayout Phone = new StaticLayout(phone, tp, 1000, Layout.Alignment.ALIGN_CENTER, 1, 0, false);
 
         // tp.setTextSize(50);
-        StaticLayout PlateNumber = new StaticLayout(plateNumber, tp, 1000, Layout.Alignment.ALIGN_CENTER, 1, 0, false);
+        StaticLayout LicensePlate = new StaticLayout(licensePlate, tp, 1000, Layout.Alignment.ALIGN_CENTER, 1, 0, false);
 
         Bitmap image = Bitmap.createBitmap(1000, 500, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(image);
@@ -207,7 +207,7 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         canvas.translate(0, 150);
         Phone.draw(canvas);
         canvas.translate(0, 150);
-        PlateNumber.draw(canvas);
+        LicensePlate.draw(canvas);
 
         return RotateBitmap(image,90);
     }
