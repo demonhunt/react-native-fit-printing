@@ -116,10 +116,6 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
                     b = total("Tổng cộng:", temp.getString("originalCost"), false);
                     mPrinter.PrintImage(b);
                 }
-                if (temp.hasKey("codFee")) {
-                    b = total("Phí thu hộ:", temp.getString("codFee"), false);
-                    mPrinter.PrintImage(b);
-                }
                 if (temp.hasKey("shipFee")) {
                     b = total("Phí vận chuyển:", temp.getString("shipFee"), false);
                     mPrinter.PrintImage(b);
@@ -145,7 +141,14 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
                     mPrinter.PrintImage(b);
                 }
             }
-
+            
+            //Print eInvoice instruction
+            if(d.getString("eInvoiceRef")!=null){
+                mPrinter.PrintText("    ", "SJIS");
+                mPrinter.PrintText("================================================", "SJIS");
+                b = generateInvoiceFooter(d.getString("eInvoiceUrl") , d.getString("eInvoiceRef"));
+                mPrinter.PrintImage(b);    
+            }
             mPrinter.PaperFeed(64);
             mPrinter.CutPaper(0);
             mPrinter.Disconnect();
@@ -157,6 +160,7 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         }
     }
 
+ 
 
     @ReactMethod
     public void printGrab(String ip, ReadableMap data, Promise promise) {
@@ -181,6 +185,36 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
             promise.reject(e.getMessage());
         }
     }
+
+    public Bitmap generateInvoiceFooter(String url , String code){
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        TextPaint tp = new TextPaint();
+        tp.setColor(Color.BLACK);
+        tp.setTextAlign(Paint.Align.LEFT);
+        tp.setAntiAlias(true);
+        tp.setTypeface(Typeface.create("Times New Roman", Typeface.BOLD));
+        tp.setTextSize(25);
+
+        StaticLayout InvoiceInfo = new StaticLayout("Quý khách tra cứu hóa đơn điện tử bằng mã ", tp, 600, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+        Bitmap image = Bitmap.createBitmap(600, 200, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(image);
+        canvas.drawPaint(paint);
+        paint.setColor(Color.BLACK);
+        paint.setTypeface(Typeface.create("Times New Roman", Typeface.NORMAL));
+        paint.setTextSize(20);
+        canvas.drawText("Quý khách tra cứu hóa đơn điện tử bằng mã",0,20,paint);
+        canvas.drawText("tại đường dẫn sau: ",0,45,paint);
+        paint.setTypeface(Typeface.create("Times New Roman", Typeface.BOLD));
+        canvas.drawText(code,410,20,paint);
+        canvas.drawText(url,190,45,paint);
+
+
+        // InvoiceInfo.draw(canvas);
+        return image;
+    }
+
 
     public Bitmap createGrabLabel(String name, String phone, String licensePlate) throws Exception {
         Paint paint2 = new Paint();
