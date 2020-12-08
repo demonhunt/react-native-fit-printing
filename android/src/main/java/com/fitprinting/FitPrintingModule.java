@@ -149,7 +149,7 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
                 b = generateInvoiceFooter(d.getString("eInvoiceUrl") , d.getString("eInvoiceRef"));
                 mPrinter.PrintImage(b);    
             }
-            mPrinter.PaperFeed(64);
+            mPrinter.PaperFeed(200);
             mPrinter.CutPaper(0);
             mPrinter.Disconnect();
             promise.resolve("success");
@@ -198,18 +198,25 @@ public class FitPrintingModule extends ReactContextBaseJavaModule {
         tp.setTextSize(25);
 
         StaticLayout InvoiceInfo = new StaticLayout("Quý khách tra cứu hóa đơn điện tử bằng mã ", tp, 600, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
-        Bitmap image = Bitmap.createBitmap(600, 200, Bitmap.Config.ARGB_8888);
+        Bitmap image = Bitmap.createBitmap(600, 300, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(image);
         canvas.drawPaint(paint);
         paint.setColor(Color.BLACK);
         paint.setTypeface(Typeface.create("Times New Roman", Typeface.NORMAL));
         paint.setTextSize(20);
         canvas.drawText("Quý khách tra cứu hóa đơn điện tử bằng mã",0,20,paint);
-        canvas.drawText("tại đường dẫn sau: ",0,45,paint);
+        canvas.drawText("tại đường dẫn: ",0,45,paint);
+        canvas.drawText(" hoặc quét mã QR sau : ",0,70,paint);
         paint.setTypeface(Typeface.create("Times New Roman", Typeface.BOLD));
         canvas.drawText(code,410,20,paint);
         canvas.drawText(url,190,45,paint);
 
+        try {
+           Bitmap qrcode = TextToImageEncode(url + "?sec=" +  code);
+           canvas.drawBitmap(qrcode, 190, 95, paint);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
 
         // InvoiceInfo.draw(canvas);
         return image;
